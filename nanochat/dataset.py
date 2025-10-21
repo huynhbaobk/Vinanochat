@@ -20,9 +20,9 @@ from nanochat.common import get_base_dir
 # The specifics of the current pretraining dataset
 
 # The URL on the internet where the data is hosted and downloaded from on demand
-BASE_URL = "https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle/resolve/main"
-MAX_SHARD = 1822 # the last datashard is shard_01822.parquet
-index_to_filename = lambda index: f"shard_{index:05d}.parquet" # format of the filenames
+BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/tree/main/data/vie_Latn/train"  # Update this with your dataset path
+MAX_SHARD = 29  # Last file is 004_00005 (5 groups of 6 files each = 30 files, index 0-29)
+index_to_filename = lambda index: f"{index // 6:03d}_{index % 6:05d}.parquet"  # format: 000_00000.parquet
 base_dir = get_base_dir()
 DATA_DIR = os.path.join(base_dir, "base_data")
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -110,7 +110,7 @@ def download_single_file(index):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Download FineWeb-Edu 100BT dataset shards")
+    parser = argparse.ArgumentParser(description="Download FineWeb-2 Vietnamese dataset shards")
     parser.add_argument("-n", "--num-files", type=int, default=-1, help="Number of shards to download (default: -1), -1 = disable")
     parser.add_argument("-w", "--num-workers", type=int, default=4, help="Number of parallel download workers (default: 4)")
     args = parser.parse_args()
