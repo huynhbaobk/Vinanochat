@@ -20,7 +20,7 @@ from nanochat.common import get_base_dir
 # The specifics of the current pretraining dataset
 
 # The URL on the internet where the data is hosted and downloaded from on demand
-BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/tree/main/data/vie_Latn/train"  # Update this with your dataset path
+BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/main/data/vie_Latn/train"  # Update this with your dataset path
 MAX_SHARD = 29  # Last file is 004_00005 (5 groups of 6 files each = 30 files, index 0-29)
 index_to_filename = lambda index: f"{index // 6:03d}_{index % 6:05d}.parquet"  # format: 000_00000.parquet
 base_dir = get_base_dir()

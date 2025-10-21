@@ -6,6 +6,23 @@ from nanochat.tokenizer import get_tokenizer, RustBPETokenizer
 from nanochat.dataset import parquets_iter_batched
 
 # Random text I got from a random website this morning
+vietnamese_text = r"""Khi người Việt sẵn sàng “đầu tư thời gian” cho AI
+Từ chỗ chỉ là công cụ công nghệ mới mẻ, trí tuệ nhân tạo (AI) đang trở thành một phần quen thuộc trong đời sống số của người Việt.
+
+Báo cáo “Tình hình ứng dụng AI của người tiêu dùng Việt Nam 2025” do Decision Lab công bố cho thấy, hơn 55% người dùng AI tại Việt Nam sẵn sàng trả phí thuê bao hàng tháng để sử dụng các nền tảng như ChatGPT, Gemini hay Meta AI.
+
+Con số này phản ánh rõ một xu thế mới: Người Việt không chỉ tò mò với AI, mà còn sẵn lòng “đầu tư thời gian và tiền bạc” để biến nó thành công cụ hữu ích trong học tập, làm việc và sáng tạo.
+
+Đáng chú ý, Gen Z – nhóm người trẻ từ 18 đến 24 tuổi – là lực đẩy chính trong làn sóng sử dụng AI. Họ chiếm tới 86% tổng lượng người dùng, trong đó 40% cho biết họ sử dụng AI mỗi ngày.
+
+Không chỉ học sinh, sinh viên, mà nhân viên văn phòng và doanh nhân cũng đang xem AI như một phần tất yếu trong guồng quay công việc hiện đại. Tỷ lệ sử dụng thường xuyên ở nhóm có bằng đại học đạt 78%, và ở nhóm sau đại học là 84%. Điều đó cho thấy người Việt có trình độ công nghệ số càng cao thì mức độ “đầu tư thời gian” cho AI càng lớn.
+
+Lý do nằm ở chỗ AI ngày càng chứng tỏ giá trị thực tiễn. 67% người được khảo sát cho rằng AI giúp họ tiết kiệm thời gian, 60% nói AI đơn giản hóa việc học, và 51% nhận thấy AI khơi gợi sáng tạo.
+
+Không còn là một công nghệ xa vời, AI giờ đây trở thành “trợ lý ảo” đồng hành trong từng quyết định nhỏ – từ soạn thảo văn bản, dịch thuật, nghiên cứu cho đến lập kế hoạch cá nhân. Với chi phí không quá cao, người dùng sẵn sàng trả tiền để có những tính năng tốt hơn, tốc độ phản hồi nhanh hơn và dữ liệu chính xác hơn.
+""".strip()
+
+
 news_text = r"""
 (Washington, D.C., July 9, 2025)- Yesterday, Mexico’s National Service of Agro-Alimentary Health, Safety, and Quality (SENASICA) reported a new case of New World Screwworm (NWS) in Ixhuatlan de Madero, Veracruz in Mexico, which is approximately 160 miles northward of the current sterile fly dispersal grid, on the eastern side of the country and 370 miles south of the U.S./Mexico border. This new northward detection comes approximately two months after northern detections were reported in Oaxaca and Veracruz, less than 700 miles away from the U.S. border, which triggered the closure of our ports to Mexican cattle, bison, and horses on May 11, 2025.
 
@@ -150,6 +167,7 @@ val_docs = next(parquets_iter_batched(split="val"))
 val_text = "\n".join(val_docs)
 
 all_text = [
+    ("vietnamese", vietnamese_text),
     ("news", news_text),
     ("korean", korean_text),
     ("code", code_text),
