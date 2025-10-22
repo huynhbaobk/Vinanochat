@@ -21,26 +21,32 @@ from nanochat.common import get_base_dir
 
 # Choose your dataset configuration by uncommenting ONE of the sections below:
 
-# ===== OPTION 1: Pattern-based filenames (e.g., 000_00000.parquet) =====
+# ===== OPTION 1: Pattern-based filenames (e.g., 000_00000.parquet) -Fineweb-2 Vietnamese =====
 # BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/main/data/vie_Latn/train"
 # MAX_SHARD = 29  # Last file is 004_00005 (30 files total, index 0-29)
 # index_to_filename = lambda index: f"{index // 6:03d}_{index % 6:05d}.parquet"
 
 # ===== OPTION 2: Hardcoded list (for files with hash in names) =====
-BASE_URL = "https://huggingface.co/datasets/vietgpt/binhvq_news_vi/resolve/main/data"
-PARQUET_FILES = [
-    "train-00000-of-00009-848cb14e692f7fe1.parquet",
-    "train-00001-of-00009-0bea50ba123d5645.parquet",
-    "train-00002-of-00009-755c295f941c40b7.parquet",
-    "train-00003-of-00009-b7e3cbe70ad9fc22.parquet",
-    "train-00004-of-00009-b71bd2a1cbaea1f0.parquet",
-    "train-00005-of-00009-332a6bd9f06e5c3b.parquet",
-    "train-00006-of-00009-e3461a4b6a75c113.parquet",
-    "train-00007-of-00009-b626231c6a8c05b7.parquet",
-    "train-00008-of-00009-02cff46dc7d09fe9.parquet",
-]
-MAX_SHARD = len(PARQUET_FILES) - 1
-index_to_filename = lambda index: PARQUET_FILES[index] if index < len(PARQUET_FILES) else None
+# BASE_URL = "https://huggingface.co/datasets/vietgpt/binhvq_news_vi/resolve/main/data"
+# PARQUET_FILES = [
+#     "train-00000-of-00009-848cb14e692f7fe1.parquet",
+#     "train-00001-of-00009-0bea50ba123d5645.parquet",
+#     "train-00002-of-00009-755c295f941c40b7.parquet",
+#     "train-00003-of-00009-b7e3cbe70ad9fc22.parquet",
+#     "train-00004-of-00009-b71bd2a1cbaea1f0.parquet",
+#     "train-00005-of-00009-332a6bd9f06e5c3b.parquet",
+#     "train-00006-of-00009-e3461a4b6a75c113.parquet",
+#     "train-00007-of-00009-b626231c6a8c05b7.parquet",
+#     "train-00008-of-00009-02cff46dc7d09fe9.parquet",
+# ]
+# MAX_SHARD = len(PARQUET_FILES) - 1
+# index_to_filename = lambda index: PARQUET_FILES[index] if index < len(PARQUET_FILES) else None
+
+
+# # ===== OPTION 3: vietnamese_curated_dataset =====
+BASE_URL = "https://huggingface.co/datasets/VTSNLP/vietnamese_curated_dataset/resolve/main/data"  
+MAX_SHARD = 131
+index_to_filename = lambda index: f"train-{index:05d}-of-00132.parquet"
 
 base_dir = get_base_dir()
 DATA_DIR = os.path.join(base_dir, "base_data")
