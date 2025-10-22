@@ -18,7 +18,7 @@ from nanochat.gpt import GPT, GPTConfig
 from nanochat.dataloader import tokenizing_distributed_data_loader
 from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir
 from nanochat.tokenizer import get_tokenizer, get_token_bytes
-from nanochat.checkpoint_manager import save_checkpoint
+from nanochat.checkpoint_manager import save_checkpoint, cleanup_old_checkpoints
 from nanochat.loss_eval import evaluate_bpb
 from nanochat.engine import Engine
 from scripts.base_eval import evaluate_model
@@ -26,7 +26,7 @@ print_banner()
 
 # -----------------------------------------------------------------------------
 # User settings
-run = "dummy" # wandb run name default ("dummy" is special - we won't log to wandb)
+run = "vinanochat" # wandb run name default ("dummy" is special - we won't log to wandb)
 # Model architecture
 depth = 20 # the depth of the Transformer model to train, rest of the kwargs are derived
 max_seq_len = 2048 # max context length
@@ -48,6 +48,9 @@ eval_tokens = 20*524288 # number of tokens to evaluate val loss on
 core_metric_every = 2000 # every how many steps to evaluate the core metric
 core_metric_max_per_task = 500 # examples per task in estimating the core metric
 sample_every = 2000 # every how many steps to sample from the model
+# Checkpointing
+checkpoint_every = 250 # every how many steps to save a checkpoint
+keep_last_n_checkpoints = 3 # how many recent checkpoints to keep (older ones are deleted)
 # Output
 model_tag = "" # optionally override the model tag for the output checkpoint directory name
 # now allow CLI to override the settings via the configurator lol
@@ -227,15 +230,15 @@ for step in range(num_iterations + 1):
             print0(tokenizer.decode(sample[0]))
         model.train()
 
-    # save checkpoint at the end of the run (only on master process)
-    if master_process and last_step:
+    # save checkpoint periodically (only on master process)
+    if master_process and (last_step or (step > 0 and step % checkpoint_every == 0)):
         output_dirname = model_tag if model_tag else f"d{depth}" # e.g. d12
         checkpoint_dir = os.path.join(base_dir, "base_checkpoints", output_dirname)
         save_checkpoint(
             checkpoint_dir,
             step,
             orig_model.state_dict(),
-            [opt.state_dict() for opt in optimizers], # TODO: make sure saving across ranks is done correctly
+            [opt.state_dict() for opt in optimizers],
             {
                 "step": step,
                 "val_bpb": val_bpb, # loss at last step
@@ -245,6 +248,13 @@ for step in range(num_iterations + 1):
                 "max_seq_len": max_seq_len,
             }
         )
+        # Clean up old checkpoints, but always keep the final one
+        if not last_step:
+            cleanup_old_checkpoints(checkpoint_dir, keep_last_n=keep_last_n_checkpoints)
+        else:
+            # For the final checkpoint, keep it plus the last N-1 regular checkpoints
+            cleanup_old_checkpoints(checkpoint_dir, keep_last_n=keep_last_n_checkpoints, keep_steps={step})
+        print0(f"Checkpoint saved at step {step}")
 
     if last_step:
         break

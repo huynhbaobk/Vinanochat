@@ -144,3 +144,31 @@ def load_model(source, *args, **kwargs):
     base_dir = get_base_dir()
     checkpoints_dir = os.path.join(base_dir, model_dir)
     return load_model_from_dir(checkpoints_dir, *args, **kwargs)
+
+
+def cleanup_old_checkpoints(checkpoint_dir, keep_last_n=3, keep_steps=None):
+    keep_steps = keep_steps or set()
+    
+    # Find all checkpoint files
+    model_files = glob.glob(os.path.join(checkpoint_dir, "model_*.pt"))
+    if not model_files:
+        return
+    
+    # Extract step numbers and sort
+    steps = sorted([int(os.path.basename(f).split("_")[-1].split(".")[0]) for f in model_files])
+    
+    # Determine which steps to delete
+    if len(steps) > keep_last_n:
+        steps_to_delete = set(steps[:-keep_last_n]) - keep_steps
+        
+        for step in steps_to_delete:
+            # Delete model, optimizer, and metadata files
+            for prefix in ["model", "optim", "meta"]:
+                pattern = os.path.join(checkpoint_dir, f"{prefix}_{step:06d}.*")
+                for filepath in glob.glob(pattern):
+                    try:
+                        os.remove(filepath)
+                        log0(f"Deleted old checkpoint: {os.path.basename(filepath)}")
+                    except Exception as e:
+                        log0(f"Warning: Failed to delete {filepath}: {e}")
+

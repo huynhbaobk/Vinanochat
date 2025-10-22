@@ -19,10 +19,29 @@ from nanochat.common import get_base_dir
 # -----------------------------------------------------------------------------
 # The specifics of the current pretraining dataset
 
-# The URL on the internet where the data is hosted and downloaded from on demand
-BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/main/data/vie_Latn/train"  # Update this with your dataset path
-MAX_SHARD = 29  # Last file is 004_00005 (5 groups of 6 files each = 30 files, index 0-29)
-index_to_filename = lambda index: f"{index // 6:03d}_{index % 6:05d}.parquet"  # format: 000_00000.parquet
+# Choose your dataset configuration by uncommenting ONE of the sections below:
+
+# ===== OPTION 1: Pattern-based filenames (e.g., 000_00000.parquet) =====
+# BASE_URL = "https://huggingface.co/datasets/HuggingFaceFW/fineweb-2/resolve/main/data/vie_Latn/train"
+# MAX_SHARD = 29  # Last file is 004_00005 (30 files total, index 0-29)
+# index_to_filename = lambda index: f"{index // 6:03d}_{index % 6:05d}.parquet"
+
+# ===== OPTION 2: Hardcoded list (for files with hash in names) =====
+BASE_URL = "https://huggingface.co/datasets/vietgpt/binhvq_news_vi/resolve/main/data"
+PARQUET_FILES = [
+    "train-00000-of-00009-848cb14e692f7fe1.parquet",
+    "train-00001-of-00009-0bea50ba123d5645.parquet",
+    "train-00002-of-00009-755c295f941c40b7.parquet",
+    "train-00003-of-00009-b7e3cbe70ad9fc22.parquet",
+    "train-00004-of-00009-b71bd2a1cbaea1f0.parquet",
+    "train-00005-of-00009-332a6bd9f06e5c3b.parquet",
+    "train-00006-of-00009-e3461a4b6a75c113.parquet",
+    "train-00007-of-00009-b626231c6a8c05b7.parquet",
+    "train-00008-of-00009-02cff46dc7d09fe9.parquet",
+]
+MAX_SHARD = len(PARQUET_FILES) - 1
+index_to_filename = lambda index: PARQUET_FILES[index] if index < len(PARQUET_FILES) else None
+
 base_dir = get_base_dir()
 DATA_DIR = os.path.join(base_dir, "base_data")
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -110,8 +129,8 @@ def download_single_file(index):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Download FineWeb-2 Vietnamese dataset shards")
-    parser.add_argument("-n", "--num-files", type=int, default=-1, help="Number of shards to download (default: -1), -1 = disable")
+    parser = argparse.ArgumentParser(description="Download dataset parquet shards")
+    parser.add_argument("-n", "--num-files", type=int, default=-1, help="Number of shards to download (default: -1 = all files)")
     parser.add_argument("-w", "--num-workers", type=int, default=4, help="Number of parallel download workers (default: 4)")
     args = parser.parse_args()
 
